@@ -61,9 +61,12 @@ export function AddDeliveryModal({
     const lat = 37.7749 + (Math.random() - 0.5) * 0.05;
     const lng = -122.4194 + (Math.random() - 0.5) * 0.05;
     
-    const newDelivery = {
-      ...data,
-      status: "pending" as const,
+    const newDelivery: Omit<Delivery, "id"> = {
+      customer: data.customer,
+      address: data.address,
+      items: data.items,
+      time: data.time,
+      status: "pending",
       coordinates: { lat, lng },
     };
 

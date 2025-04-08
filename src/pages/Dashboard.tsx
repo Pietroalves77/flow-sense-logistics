@@ -12,9 +12,20 @@ import { Button } from "@/components/ui/button";
 import { AddDeliveryModal } from "@/components/dashboard/AddDeliveryModal";
 import { useDeliveries } from "@/hooks/useDeliveries";
 
+// Add type definitions for stats
+interface StatsData {
+  totalDeliveries: number;
+  onTimeRate: number;
+  activeDrivers: number;
+  avgDeliveryTime: number;
+}
+
 const Dashboard = () => {
   const [isAddDeliveryModalOpen, setIsAddDeliveryModalOpen] = useState(false);
   const { stats, addDelivery, isLoading } = useDeliveries();
+
+  // Type assertion to ensure stats has the right type
+  const typedStats = stats as StatsData | undefined;
 
   const handleAddDelivery = (delivery: any) => {
     addDelivery(delivery);
@@ -47,7 +58,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <StatCard
               title="Total de Entregas"
-              value={isLoading ? "..." : stats?.totalDeliveries.toString() || "0"}
+              value={isLoading ? "..." : typedStats?.totalDeliveries.toString() || "0"}
               icon={<Package className="h-5 w-5" />}
               change={12}
               trend="up"
@@ -55,7 +66,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Taxa de Pontualidade"
-              value={isLoading ? "..." : `${stats?.onTimeRate || 0}%`}
+              value={isLoading ? "..." : `${typedStats?.onTimeRate || 0}%`}
               icon={<Clock className="h-5 w-5" />}
               change={3.5}
               trend="up"
@@ -63,7 +74,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Motoristas Ativos"
-              value={isLoading ? "..." : stats?.activeDrivers.toString() || "0"}
+              value={isLoading ? "..." : typedStats?.activeDrivers.toString() || "0"}
               icon={<Users className="h-5 w-5" />}
               change={0}
               trend="neutral"
@@ -71,7 +82,7 @@ const Dashboard = () => {
             />
             <StatCard
               title="Tempo Médio de Entrega"
-              value={isLoading ? "..." : `${stats?.avgDeliveryTime || 0} min`}
+              value={isLoading ? "..." : `${typedStats?.avgDeliveryTime || 0} min`}
               icon={<Truck className="h-5 w-5" />}
               change={-5}
               trend="down"

@@ -3,6 +3,14 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { deliveryService, Delivery } from "@/services/deliveryService";
 
+// Define the type for stats
+interface StatsData {
+  totalDeliveries: number;
+  onTimeRate: number;
+  activeDrivers: number;
+  avgDeliveryTime: number;
+}
+
 export function useDeliveries() {
   const queryClient = useQueryClient();
   
@@ -25,13 +33,13 @@ export function useDeliveries() {
     queryFn: deliveryService.getDrivers,
   });
   
-  // Consulta para obter estatísticas
+  // Consulta para obter estatísticas com o tipo correto
   const { 
     data: stats, 
     isLoading: isLoadingStats,
-  } = useQuery({
+  } = useQuery<StatsData>({
     queryKey: ['stats'],
-    queryFn: deliveryService.getStats,
+    queryFn: deliveryService.getStats as () => Promise<StatsData>,
   });
   
   // Mutação para adicionar nova entrega
