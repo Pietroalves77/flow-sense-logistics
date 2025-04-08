@@ -1,5 +1,5 @@
 
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import MainLayout from "@/components/layout/MainLayout";
 import StatCard from "@/components/dashboard/StatCard";
 import DeliveryList from "@/components/dashboard/DeliveryList";
