@@ -8,6 +8,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import Signup from "./pages/Signup";
 
 // Páginas do menu lateral
 import LiveMap from "./pages/LiveMap";
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/signup" element={<Signup />} />
             
             {/* Páginas do menu lateral */}
             <Route path="/live-map" element={<LiveMap />} />
