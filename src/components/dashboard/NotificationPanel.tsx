@@ -1,187 +1,233 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Bell, Check, Clock, Info, AlertTriangle, Truck, Package, RefreshCw } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Bell, CheckCircle, Clock, Package, RotateCw, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
-type NotificationType = "info" | "warning" | "success" | "error";
+interface NotificationPanelProps {
+  fullPage?: boolean;
+}
 
-interface Notification {
+type Notification = {
   id: string;
   title: string;
   message: string;
   time: string;
-  type: NotificationType;
-  isRead: boolean;
-  icon?: JSX.Element;
-}
+  read: boolean;
+  icon: React.ReactNode;
+  type: "delivery" | "system" | "alert";
+};
 
-const notifications: Notification[] = [
+const notificationsData: Notification[] = [
   {
     id: "1",
-    title: "Rota Otimizada",
-    message: "IA otimizou as rotas de entrega de hoje, economizando 42 minutos.",
-    time: "Agora",
-    type: "success",
-    isRead: false,
-    icon: <RefreshCw className="h-4 w-4" />,
+    title: "Nova entrega",
+    message: "Uma nova entrega foi atribuída à sua rota",
+    time: "5 minutos atrás",
+    read: false,
+    icon: <Package className="h-5 w-5" />,
+    type: "delivery",
   },
   {
     id: "2",
-    title: "Entrega Atrasada",
-    message: "Pacote #D-1234 está atrasado devido a congestionamento.",
-    time: "10 min atrás",
-    type: "warning",
-    isRead: false,
-    icon: <Clock className="h-4 w-4" />,
+    title: "Rota otimizada",
+    message: "IA otimizou suas rotas de entrega para hoje",
+    time: "1 hora atrás",
+    read: false,
+    icon: <RotateCw className="h-5 w-5" />,
+    type: "system",
   },
   {
     id: "3",
-    title: "Novo Pedido",
-    message: "10 novos pedidos recebidos da Acme Corp.",
-    time: "30 min atrás",
-    type: "info",
-    isRead: true,
-    icon: <Package className="h-4 w-4" />,
+    title: "Atualização do sistema",
+    message: "O Track Flow foi atualizado para a versão 2.3",
+    time: "Ontem",
+    read: false,
+    icon: <Bell className="h-5 w-5" />,
+    type: "system",
   },
   {
     id: "4",
-    title: "Motorista Disponível",
-    message: "John Smith está agora disponível para entregas.",
-    time: "1 hora atrás",
-    type: "info",
-    isRead: true,
-    icon: <Truck className="h-4 w-4" />,
+    title: "Entrega atrasada",
+    message: "A entrega #1234 está atrasada. Entre em contato com o motorista.",
+    time: "3 horas atrás",
+    read: true,
+    icon: <Clock className="h-5 w-5" />,
+    type: "alert",
   },
   {
     id: "5",
-    title: "Atualização do Sistema",
-    message: "Track Flow foi atualizado para a versão 2.3.0.",
-    time: "2 horas atrás",
-    type: "info",
-    isRead: true,
-    icon: <Info className="h-4 w-4" />,
-  },
+    title: "Entrega concluída",
+    message: "A entrega #5678 foi entregue com sucesso",
+    time: "Ontem",
+    read: true,
+    icon: <CheckCircle className="h-5 w-5" />,
+    type: "delivery",
+  }
 ];
 
-const getIconForType = (type: NotificationType, customIcon?: JSX.Element) => {
-  if (customIcon) return customIcon;
-  
-  switch (type) {
-    case "success":
-      return <Check className="h-4 w-4" />;
-    case "warning":
-      return <AlertTriangle className="h-4 w-4" />;
-    case "error":
-      return <AlertTriangle className="h-4 w-4" />;
-    case "info":
-    default:
-      return <Info className="h-4 w-4" />;
-  }
-};
-
-const getBgColorForType = (type: NotificationType) => {
-  switch (type) {
-    case "success":
-      return "bg-green-100 text-green-800";
-    case "warning":
-      return "bg-yellow-100 text-yellow-800";
-    case "error":
-      return "bg-red-100 text-red-800";
-    case "info":
-    default:
-      return "bg-blue-100 text-blue-800";
-  }
-};
-
-const NotificationPanel = () => {
-  const [notificationsList, setNotificationsList] = useState<Notification[]>(notifications);
-
-  const markAllAsRead = () => {
-    setNotificationsList(notificationsList.map(n => ({ ...n, isRead: true })));
-    toast.success("Todas as notificações marcadas como lidas");
-  };
-
-  const handleNotificationClick = (notification: Notification) => {
-    // Marca a notificação específica como lida
-    if (!notification.isRead) {
-      setNotificationsList(notificationsList.map(n => 
-        n.id === notification.id ? { ...n, isRead: true } : n
-      ));
-    }
-    
-    // Exibe detalhes da notificação
-    toast(notification.title, {
-      description: notification.message,
+if (typeof window !== "undefined") {
+  // Adicionar mais notificações para a página completa
+  for (let i = 6; i <= 12; i++) {
+    notificationsData.push({
+      id: i.toString(),
+      title: `Motorista disponível`,
+      message: `O motorista João Silva está disponível para novas entregas`,
+      time: i % 2 === 0 ? "2 dias atrás" : "Semana passada",
+      read: true,
+      icon: <Truck className="h-5 w-5" />,
+      type: "system",
     });
+  }
+}
+
+const NotificationPanel = ({ fullPage = false }: NotificationPanelProps) => {
+  const [notifications, setNotifications] = useState<Notification[]>(notificationsData);
+  const [filter, setFilter] = useState<string>("all");
+  const navigate = useNavigate();
+  
+  const unreadCount = notifications.filter(n => !n.read).length;
+  
+  const filteredNotifications = notifications.filter(notification => {
+    if (filter === "all") return true;
+    if (filter === "unread") return !notification.read;
+    return notification.type === filter;
+  });
+  
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
   };
-
-  const unreadCount = notificationsList.filter(n => !n.isRead).length;
-
+  
+  const markAsRead = (id: string) => {
+    setNotifications(notifications.map(n => 
+      n.id === id ? { ...n, read: true } : n
+    ));
+  };
+  
+  const handleViewAllClick = () => {
+    if (!fullPage) {
+      navigate('/notifications');
+    }
+  };
+  
   return (
-    <Card className="h-[400px]">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-medium flex items-center">
-          <Bell className="mr-2 h-5 w-5" /> 
-          Notificações
-          {unreadCount > 0 && (
-            <span className="ml-2 px-1.5 py-0.5 text-xs font-medium bg-trackflow-teal text-white rounded-full">
-              {unreadCount}
-            </span>
-          )}
-        </CardTitle>
-        <Button variant="ghost" size="sm" onClick={markAllAsRead} disabled={unreadCount === 0}>
-          Marcar todas como lidas
-        </Button>
+    <Card className={cn(fullPage ? "h-auto" : "h-[calc(100vh-16rem)]")}>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div>
+          <CardTitle>Notificações</CardTitle>
+          <CardDescription>
+            Você tem {unreadCount} notificações não lidas
+          </CardDescription>
+        </div>
+        {unreadCount > 0 && (
+          <Button variant="outline" size="sm" onClick={markAllAsRead}>
+            Marcar todas como lidas
+          </Button>
+        )}
       </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-[340px]">
-          <div className="px-4 py-2">
-            {notificationsList.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Nenhuma notificação
-              </div>
-            ) : (
-              notificationsList.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    "flex items-start p-3 mb-2 rounded-md transition-colors cursor-pointer",
-                    notification.isRead ? "bg-background" : "bg-gray-50"
-                  )}
-                  onClick={() => handleNotificationClick(notification)}
-                >
-                  <div
-                    className={cn(
-                      "flex items-center justify-center h-8 w-8 rounded-full mr-3 flex-shrink-0",
-                      getBgColorForType(notification.type)
-                    )}
-                  >
-                    {getIconForType(notification.type, notification.icon)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-1">
-                      <h4 className="font-medium text-sm">{notification.title}</h4>
-                      <span className="text-xs text-muted-foreground ml-2">
-                        {notification.time}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {notification.message}
-                    </p>
-                  </div>
-                  {!notification.isRead && (
-                    <div className="h-2 w-2 bg-trackflow-teal rounded-full flex-shrink-0 mt-1.5 ml-2"></div>
-                  )}
+      
+      {fullPage && (
+        <div className="px-6 pb-2 flex space-x-2">
+          <Button 
+            variant={filter === "all" ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setFilter("all")}
+          >
+            Todas
+          </Button>
+          <Button 
+            variant={filter === "unread" ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setFilter("unread")}
+          >
+            Não lidas
+          </Button>
+          <Button 
+            variant={filter === "delivery" ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setFilter("delivery")}
+          >
+            Entregas
+          </Button>
+          <Button 
+            variant={filter === "system" ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setFilter("system")}
+          >
+            Sistema
+          </Button>
+          <Button 
+            variant={filter === "alert" ? "default" : "outline"} 
+            size="sm" 
+            onClick={() => setFilter("alert")}
+          >
+            Alertas
+          </Button>
+        </div>
+      )}
+      
+      <CardContent className={cn("px-2 overflow-auto", fullPage ? "max-h-[calc(100vh-20rem)]" : "h-[calc(100%-5rem)]")}>
+        <div className="space-y-1">
+          {filteredNotifications.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Não há notificações {filter !== "all" ? "com este filtro" : ""}
+            </div>
+          ) : (
+            filteredNotifications.map((notification) => (
+              <div 
+                key={notification.id}
+                className={cn(
+                  "flex items-start space-x-4 rounded-md p-3 transition-all hover:bg-accent/40 cursor-pointer",
+                  !notification.read && "bg-accent/20"
+                )}
+                onClick={() => markAsRead(notification.id)}
+              >
+                <div className={cn(
+                  "shrink-0 rounded-full p-1",
+                  notification.type === "alert" ? "bg-destructive/10 text-destructive" :
+                  notification.type === "delivery" ? "bg-green-500/10 text-green-500" :
+                  "bg-blue-500/10 text-blue-500"
+                )}>
+                  {notification.icon}
                 </div>
-              ))
-            )}
-          </div>
-        </ScrollArea>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium leading-none">
+                      {notification.title}
+                    </p>
+                    {!notification.read && (
+                      <Badge variant="outline" className="ml-auto">
+                        Nova
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {notification.message}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {notification.time}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </CardContent>
+      {!fullPage && (
+        <div className="p-2 border-t">
+          <Button 
+            variant="ghost" 
+            className="w-full justify-center" 
+            size="sm"
+            onClick={handleViewAllClick}
+          >
+            Ver todas as notificações
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };

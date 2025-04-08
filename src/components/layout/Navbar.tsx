@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Bell, Menu, X, LogIn } from "lucide-react";
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface NavbarProps {
   onMenuClick?: () => void;
@@ -19,9 +20,22 @@ interface NavbarProps {
 
 const Navbar = ({ onMenuClick, showMenuButton = false }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleMobileMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleNotificationClick = () => {
+    toast({
+      title: "Notificações",
+      description: "Você tem 3 notificações não lidas.",
+    });
+  };
+
+  const handleViewAllNotifications = () => {
+    navigate("/notifications");
   };
 
   return (
@@ -71,7 +85,7 @@ const Navbar = ({ onMenuClick, showMenuButton = false }: NavbarProps) => {
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="notification-badge">
+              <Button variant="ghost" size="icon" className="notification-badge" onClick={handleNotificationClick}>
                 <Bell className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
@@ -111,7 +125,7 @@ const Navbar = ({ onMenuClick, showMenuButton = false }: NavbarProps) => {
                 </div>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="p-2 text-center text-sm cursor-pointer">
+              <DropdownMenuItem className="p-2 text-center text-sm cursor-pointer" onClick={handleViewAllNotifications}>
                 View all notifications
               </DropdownMenuItem>
             </DropdownMenuContent>
