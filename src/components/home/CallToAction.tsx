@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle2, Building2, HeadSet } from "lucide-react";
+import { ArrowRight, CheckCircle2, Building2, Headset } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const CallToAction = () => {
