@@ -25,7 +25,7 @@ const AddressInput = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white focus:border-trackflow-blue focus:ring-1 focus:ring-trackflow-blue"
+        className="w-full bg-white border-blue-100 focus:border-trackflow-blue focus:ring-2 focus:ring-trackflow-blue/20"
       />
     </div>
   );
