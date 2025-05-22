@@ -22,6 +22,10 @@ import Settings from "./pages/Settings";
 import Support from "./pages/Support";
 import UserUpdate from "./pages/UserUpdate";
 
+// Páginas de administração
+import AdminUsersList from "./pages/AdminUsersList";
+import AdminUserUpdate from "./pages/AdminUserUpdate";
+
 // Páginas da empresa
 import AboutUs from "./pages/company/AboutUs";
 import Careers from "./pages/company/Careers";
@@ -62,6 +66,10 @@ const App = () => (
             <Route path="/support" element={<Support />} />
             <Route path="/users/update/:id" element={<UserUpdate />} />
             <Route path="/users/update" element={<UserUpdate />} />
+            
+            {/* Páginas de administração */}
+            <Route path="/admin/users" element={<AdminUsersList />} />
+            <Route path="/admin/users/edit/:id" element={<AdminUserUpdate />} />
 
             {/* Páginas da empresa */}
             <Route path="/about" element={<AboutUs />} />

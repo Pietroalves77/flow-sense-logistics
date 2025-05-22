@@ -21,13 +21,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 interface UserUpdateFormProps {
   userId: string;
   onSuccess?: () => void;
+  isAdminMode?: boolean;
 }
 
-const UserUpdateForm = ({ userId, onSuccess }: UserUpdateFormProps) => {
+const UserUpdateForm = ({ userId, onSuccess, isAdminMode = false }: UserUpdateFormProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [usePassword, setUsePassword] = useState(false);
@@ -135,6 +137,27 @@ const UserUpdateForm = ({ userId, onSuccess }: UserUpdateFormProps) => {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
+          {isAdminMode && (
+            <div className="bg-blue-50 p-4 rounded-md border border-blue-100 mb-6">
+              <h3 className="font-medium text-trackflow-blue mb-2">Modo Administrador</h3>
+              <p className="text-sm text-slate-600">
+                Você está editando este usuário como administrador. Todas as alterações serão registradas.
+              </p>
+            </div>
+          )}
+          
+          {/* User ID display for admin */}
+          {isAdminMode && (
+            <div className="mb-4">
+              <FormLabel>ID do Usuário</FormLabel>
+              <div className="flex items-center mt-1">
+                <Badge variant="outline" className="text-xs font-mono px-2 py-1">
+                  {userId}
+                </Badge>
+              </div>
+            </div>
+          )}
+
           {/* Identifier field */}
           <FormField
             control={form.control}
@@ -272,6 +295,14 @@ const UserUpdateForm = ({ userId, onSuccess }: UserUpdateFormProps) => {
         >
           {isLoading ? "Salvando..." : "Salvar alterações"}
         </Button>
+        
+        {isAdminMode && (
+          <div className="mt-6 pt-6 border-t border-slate-200">
+            <p className="text-xs text-muted-foreground">
+              As alterações realizadas em modo administrador são registradas no log do sistema.
+            </p>
+          </div>
+        )}
       </form>
     </Form>
   );

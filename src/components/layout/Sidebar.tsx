@@ -16,6 +16,7 @@ import {
   Bell,
   Compass,
   HelpCircle,
+  UserCog,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -27,7 +28,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
   const sidebarLinks = [
@@ -70,6 +71,11 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       name: "Team",
       path: "/team",
       icon: Users,
+    },
+    {
+      name: "Admin Users",
+      path: "/admin/users",
+      icon: UserCog,
     },
     {
       name: "Settings",
