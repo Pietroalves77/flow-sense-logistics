@@ -20,6 +20,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import Team from "./pages/Team";
 import Settings from "./pages/Settings";
 import Support from "./pages/Support";
+import UserUpdate from "./pages/UserUpdate";
 
 // Páginas da empresa
 import AboutUs from "./pages/company/AboutUs";
@@ -59,6 +60,8 @@ const App = () => (
             <Route path="/team" element={<Team />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/support" element={<Support />} />
+            <Route path="/users/update/:id" element={<UserUpdate />} />
+            <Route path="/users/update" element={<UserUpdate />} />
 
             {/* Páginas da empresa */}
             <Route path="/about" element={<AboutUs />} />
